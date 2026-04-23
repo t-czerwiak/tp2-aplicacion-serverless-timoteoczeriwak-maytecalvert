@@ -1,0 +1,125 @@
+---
+import '../styles/global.css'
+
+const { title = 'Cosmos' } = Astro.props
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} — Cosmos</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="/" class="brand">COSMOS</a>
+
+      <nav class="nav-links" id="nav-links">
+        <a href="/" class="nav-link" data-path="/">Explorar</a>
+        <a href="/favorites" class="nav-link auth-only hidden" data-path="/favorites">Favoritos</a>
+      </nav>
+
+      <div class="nav-auth" id="nav-auth">
+        <a href="/profile" class="nav-link auth-only hidden" data-path="/profile">Perfil</a>
+        <button class="btn btn-ghost auth-only hidden" id="btn-signout">Salir</button>
+        <a href="/login"    class="nav-link guest-only" id="nav-login">Ingresar</a>
+        <a href="/register" class="btn btn-primary guest-only" id="nav-register">Registrarse</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <slot />
+  </main>
+</body>
+</html>
+
+<script>
+  import { supabase } from '../lib/supabase.js'
+
+  async function initNav() {
+    const { data: { session } } = await supabase.auth.getSession()
+
+    const authEls  = document.querySelectorAll('.auth-only')
+    const guestEls = document.querySelectorAll('.guest-only')
+
+    if (session) {
+      authEls.forEach(el  => el.classList.remove('hidden'))
+      guestEls.forEach(el => el.classList.add('hidden'))
+    }
+
+    // mark active link
+    const path = window.location.pathname
+    document.querySelectorAll('.nav-link[data-path]').forEach(a => {
+      if (a.dataset.path === path) a.classList.add('active')
+    })
+
+    document.getElementById('btn-signout')?.addEventListener('click', async () => {
+      await supabase.auth.signOut()
+      window.location.href = '/login'
+    })
+  }
+
+  initNav()
+</script>
+
+<style>
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(3,4,10,0.88);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--rim);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    height: 62px;
+  }
+
+  .brand {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    color: var(--nebula);
+    flex-shrink: 0;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .nav-link {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--dim);
+    padding: 6px 12px;
+    border-radius: var(--r);
+    transition: color var(--ease), background var(--ease);
+    text-transform: uppercase;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--star);
+    background: var(--surface);
+  }
+
+  .nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .hidden { display: none !important; }
+</style>
