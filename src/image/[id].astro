@@ -1,0 +1,76 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import CommentList from "../components/CommentList.astro";
+import FavoriteButton from "../components/FavoriteButton.astro";
+import { supabase } from "../lib/supabase";
+
+const { id } = Astro.params;
+
+const { data: body } = await supabase
+  .from("celestial_bodies")
+  .select("*")
+  .eq("id", id)
+  .single();
+
+const { data: comments } = await supabase
+  .from("comments")
+  .select("*, profiles(username)")
+  .eq("celestial_body_id", id)
+  .order("created_at", { ascending: false });
+
+const safeComments = comments ?? [];
+
+if (!body) return Astro.redirect("/");
+---
+
+<Layout title={body.name}>
+  <Header />
+  <main class="container">
+    <div class="image-detail">
+      <img src={body.image_url} alt={body.name} />
+      <div class="info">
+        <h1>{body.name}</h1>
+        <span class="category">{body.category}</span>
+        <p>{body.description}</p>
+        <FavoriteButton bodyId={body.id} />
+      </div>
+    </div>
+    <CommentList comments={safeComments} bodyId={body.id} />
+  </main>
+</Layout>
+
+<style>
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+.image-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+.image-detail img {
+  width: 100%;
+  border-radius: 12px;
+}
+.info h1 {
+  font-size: 2rem;
+  color: #f8fafc;
+  margin-bottom: 8px;
+}
+.category {
+  background: #312e81;
+  color: #a5b4fc;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+.info p {
+  color: #cbd5e1;
+  margin-top: 16px;
+  line-height: 1.6;
+}
+</style>
