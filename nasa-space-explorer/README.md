@@ -1,43 +1,82 @@
-# Astro Starter Kit: Minimal
+Ya dejé armado el front visual con componentes separados. La conexión con back debería hacerse principalmente desde `src/lib/api.js`, porque todos los componentes consumen funciones desde ahí.
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Los puntos a conectar serían:
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+`getAllBodies()` para traer las imágenes/cuerpos de la home.
+`addFavorite(bodyId)` y `removeFavorite(bodyId)` para favoritos.
+`getUserFavorites()` para la pantalla de favoritos.
+`getComments(bodyId)` para mostrar comentarios de cada imagen.
+`addComment(bodyId, content)` para guardar comentarios.
+`signIn(email, password)` para login.
+`signUp(email, password)` para registro.
+`signOut()` y `getUser()` para sesión.
 
-## 🚀 Project Structure
+La idea es reemplazar los mocks de `api.js` por llamadas reales a Supabase sin tocar los componentes visuales.
 
-Inside of your Astro project, you'll see the following folders and files:
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+# NASA Space Explorer
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Mayte Calvert
+Curso: 5A
 
-Any static assets, like images, can be placed in the `public/` directory.
 
-## 🧞 Commands
+# Descripción
 
-All commands are run from the root of the project, from a terminal:
+El proyecto consiste en una aplicación web sobre el espacio (NASA), donde se pueden ver imágenes de cuerpos celestes, interactuar con ellas y gestionar contenido del usuario.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+El trabajo está dividido en dos partes:
+- Frontend (visual)
+- Backend (serverless)
 
-## 👀 Want to learn more?
+En este caso se desarrolló la parte visual.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+
+# Qué hice
+
+- Diseño general de la página
+- Cards para mostrar imágenes del espacio
+- Estructura de componentes reutilizables
+- Pantallas de login y registro
+- Página de favoritos (estructura base)
+- Sistema de comentarios (visual)
+- Botón de favoritos (visual)
+
+
+
+# Funcionalidades
+
+- Ver imágenes del espacio organizadas en cards
+- Agregar una imagen a favoritos
+- Ver comentarios en cada imagen
+- Escribir comentarios
+- Navegar a login y register
+- Interfaz responsive básica
+
+
+# Estructura
+
+src/
+components/
+pages/
+layouts/
+lib/
+
+# Cómo ejecutar
+
+1. Entrar a la carpeta del frontend:
+
+cd nasa-space-explorer
+
+2. Instalar dependencias:
+
+npm install
+
+3. Ejecutar el proyecto:
+
+npm run dev
+
+4. Abrir en el navegador:
+
+http://localhost:4321

@@ -1,0 +1,65 @@
+---
+import { addComment } from "../lib/api";
+
+const { bodyId } = Astro.props;
+---
+
+<form class="comment-form" data-id={bodyId}>
+  <input type="text" placeholder="Escribí un comentario..." />
+  <button type="submit">Enviar</button>
+</form>
+
+<script>
+  document.querySelectorAll(".comment-form").forEach((form) => {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const input = form.querySelector("input");
+      const text = input.value.trim();
+      const id = form.dataset.id;
+
+      if (!text) return;
+
+      await addComment(id, text);
+
+      input.value = "";
+      alert("Comentario enviado");
+    });
+  });
+</script>
+
+<style>
+  .comment-form {
+    display: flex;
+    gap: 8px;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 12px;
+    background: #020617;
+    color: #f8fafc;
+    outline: none;
+  }
+
+  input::placeholder {
+    color: #64748b;
+  }
+
+  button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 12px;
+    background: #818cf8;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #6366f1;
+  }
+</style>

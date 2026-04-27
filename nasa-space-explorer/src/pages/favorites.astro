@@ -1,0 +1,47 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+---
+
+<Layout title="Favoritos | NASA Explorer">
+  <Header />
+
+  <main class="page">
+    <section class="panel">
+      <h1>Favoritos</h1>
+      <p>Acá se van a mostrar las imágenes guardadas por el usuario.</p>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  :global(body) {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #111827, #020617);
+    color: #e2e8f0;
+  }
+
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+
+  .panel {
+    background: #111827;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  h1 {
+    color: #f8fafc;
+    font-size: 2.5rem;
+  }
+
+  p {
+    color: #cbd5e1;
+  }
+</style>

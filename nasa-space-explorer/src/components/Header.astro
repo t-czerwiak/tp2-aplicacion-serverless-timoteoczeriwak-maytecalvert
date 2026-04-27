@@ -1,5 +1,8 @@
 <header class="header">
-  <a href="/" class="logo">🚀 NASA Explorer</a>
+  <a href="/" class="logo">
+  <span class="logo-icon">✦</span>
+  NASA Explorer
+  </a>
 
   <nav>
     <a href="/">Inicio</a>
@@ -18,12 +21,26 @@
     color: white;
   }
 
-  .logo {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: white;
-    text-decoration: none;
-  }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #f8fafc;
+  text-decoration: none;
+}
+
+.logo-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #818cf8, #22d3ee);
+  color: #020617;
+  font-weight: 900;
+}
 
   nav {
     display: flex;
