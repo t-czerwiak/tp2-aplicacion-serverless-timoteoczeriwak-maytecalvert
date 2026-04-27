@@ -1,0 +1,87 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+---
+
+<Layout title="Ingresar | NASA Explorer">
+  <Header />
+
+  <main class="page">
+    <section class="auth-card">
+      <h1>Ingresar</h1>
+      <p>Accedé para guardar favoritos y comentar imágenes.</p>
+
+      <form>
+        <input type="email" placeholder="Email" />
+        <input type="password" placeholder="Contraseña" />
+        <button type="submit">Ingresar</button>
+      </form>
+
+      <a href="/register">Crear una cuenta</a>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  :global(body) {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #111827, #020617);
+    color: #e2e8f0;
+  }
+
+  .page {
+    min-height: calc(100vh - 80px);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: #111827;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  }
+
+  h1 {
+    margin: 0 0 8px;
+    color: #f8fafc;
+  }
+
+  p {
+    color: #94a3b8;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  input {
+    padding: 13px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    background: #020617;
+    color: #f8fafc;
+  }
+
+  button {
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    background: #818cf8;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  a {
+    color: #67e8f9;
+  }
+</style>

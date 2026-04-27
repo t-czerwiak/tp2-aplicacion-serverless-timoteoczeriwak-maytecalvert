@@ -1,0 +1,93 @@
+---
+import FavoriteButton from "./FavoriteButton.astro";
+import CommentList from "./CommentList.astro";
+import CommentForm from "./CommentForm.astro";
+
+const { item } = Astro.props;
+---
+
+<article class="card">
+  <img class="card-image" src={item.image_url} alt={item.title} />
+
+  <div class="content">
+    <div class="text-content">
+      <span class="category">{item.category}</span>
+      <h3>{item.title}</h3>
+      <p>{item.description}</p>
+    </div>
+
+    <FavoriteButton bodyId={item.id} />
+
+    <section class="comments-box">
+      <CommentList bodyId={item.id} />
+      <CommentForm bodyId={item.id} />
+    </section>
+  </div>
+</article>
+
+<style>
+  .card {
+    background: #111827;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 55px rgba(0, 0, 0, 0.45);
+  }
+
+  .card-image {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    display: block;
+    background: #020617;
+  }
+
+  .content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .text-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+ .category {
+  width: fit-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.14);
+  color: #67e8f9;
+  font-size: 0.8rem;
+  font-weight: 700;
+ }
+
+  h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.35rem;
+  }
+
+  p {
+    margin: 0;
+    color: #cbd5e1;
+    line-height: 1.5;
+  }
+
+  .comments-box {
+    margin-top: 4px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(148, 163, 184, 0.18);
+  }
+</style>
