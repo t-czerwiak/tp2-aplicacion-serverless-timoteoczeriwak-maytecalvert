@@ -1,3 +1,5 @@
+import { supabase } from "./supabase";
+
 // 🔹 DATA FAKE PARA DESARROLLO
 
 let mockComments = {
