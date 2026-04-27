@@ -5,14 +5,51 @@ import Header from "../components/Header.astro";
 
 <Layout title="Favoritos | NASA Explorer">
   <Header />
-
   <main class="page">
-    <section class="panel">
-      <h1>Favoritos</h1>
-      <p>Acá se van a mostrar las imágenes guardadas por el usuario.</p>
-    </section>
+    <h1>Mis favoritos</h1>
+    <div id="content">
+      <p class="empty">Cargando...</p>
+    </div>
   </main>
 </Layout>
+
+<script>
+  import { supabase } from "../lib/supabase";
+
+  const content = document.getElementById("content");
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    content.innerHTML = `<p class="empty">Tenés que <a href="/login">iniciar sesión</a> para ver tus favoritos.</p>`;
+  } else {
+    const { data } = await supabase
+      .from("favorites")
+      .select("*, celestial_bodies(*)")
+      .eq("user_id", user.id);
+
+    const items = data?.map(f => f.celestial_bodies) ?? [];
+
+    if (items.length === 0) {
+      content.innerHTML = `<p class="empty">Todavía no guardaste ningún favorito.</p>`;
+    } else {
+      content.innerHTML = `
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
+    ${items.map(item => `
+        <div style="background:#111827;border:1px solid rgba(148,163,184,0.2);border-radius:22px;overflow:hidden;">
+          <img src="${item.image_url}" alt="${item.name}" style="width:100%;height:200px;max-height:200px;object-fit:cover;background:#020617;display:block;" />
+          <div style="padding:16px;">
+            <span style="padding:4px 10px;border-radius:999px;background:rgba(34,211,238,0.14);color:#67e8f9;font-size:0.8rem;font-weight:700;">${item.category}</span>
+            <h3 style="color:#f8fafc;margin:8px 0 4px;">${item.name}</h3>
+            <p style="color:#cbd5e1;font-size:0.9rem;margin:0;">${item.description}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+    }
+  }
+</script>
 
 <style>
   :global(body) {
@@ -21,27 +58,40 @@ import Header from "../components/Header.astro";
     background: radial-gradient(circle at top, #111827, #020617);
     color: #e2e8f0;
   }
-
   .page {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 80px 24px;
+    padding: 40px 24px;
   }
-
-  .panel {
+  h1 { color: #f8fafc; font-size: 2rem; margin-bottom: 24px; }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  .card {
     background: #111827;
     border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 24px;
-    padding: 40px;
-    text-align: center;
+    border-radius: 22px;
+    overflow: hidden;
   }
-
-  h1 {
-    color: #f8fafc;
-    font-size: 2.5rem;
+  .card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background: #020617;
   }
-
-  p {
-    color: #cbd5e1;
+  .info { padding: 16px; }
+  .category {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(34, 211, 238, 0.14);
+    color: #67e8f9;
+    font-size: 0.8rem;
+    font-weight: 700;
   }
+  .info h3 { color: #f8fafc; margin: 8px 0 4px; }
+  .info p { color: #cbd5e1; font-size: 0.9rem; margin: 0; }
+  .empty { color: #94a3b8; }
+  .empty a { color: #67e8f9; }
 </style>

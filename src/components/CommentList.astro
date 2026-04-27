@@ -1,54 +1,63 @@
 ---
-import { getComments } from "../lib/api";
-
 const { bodyId } = Astro.props;
-const comments = await getComments(bodyId);
 ---
 
-<div class="comments">
+<div class="comments-wrapper" data-id={bodyId}>
   <h4>Comentarios</h4>
-
-  {comments.length === 0 ? (
-    <p class="empty">Todavía no hay comentarios.</p>
-  ) : (
-    <div class="comment-list">
-      {comments.map((comment) => (
-        <p class="comment">{comment.content}</p>
-      ))}
-    </div>
-  )}
+  <div class="comment-list">
+    <p class="empty">Cargando...</p>
+  </div>
 </div>
 
+<script>
+  import { supabase } from "../lib/supabase";
+
+  async function loadComments(container, bodyId) {
+    const { data } = await supabase
+      .from("comments")
+      .select("*, profiles(username)")
+      .eq("celestial_body_id", bodyId)
+      .order("created_at", { ascending: false });
+
+    const list = container.querySelector(".comment-list");
+    const comments = data ?? [];
+
+    if (comments.length === 0) {
+      list.innerHTML = `<p class="empty">Todavía no hay comentarios.</p>`;
+    } else {
+      list.innerHTML = comments.map(c => `
+        <div style="padding:10px 12px;border-radius:12px;background:#020617;margin-bottom:8px;">
+          <span style="font-size:0.75rem;color:#67e8f9;font-weight:700;">@${c.profiles?.username ?? "usuario"}</span>
+          <p style="margin:4px 0 0;color:#e2e8f0;font-size:0.9rem;line-height:1.4;">${c.content}</p>
+        </div>
+      `).join("");
+    }
+  }
+
+  document.querySelectorAll(".comments-wrapper[data-id]").forEach(container => {
+    loadComments(container, container.dataset.id);
+  });
+
+  window.addEventListener("comment-sent", (e) => {
+    const container = document.querySelector(`.comments-wrapper[data-id="${e.detail.bodyId}"]`);
+    if (container) loadComments(container, e.detail.bodyId);
+  });
+</script>
+
 <style>
-  .comments {
-    margin-bottom: 12px;
-  }
-
-  h4 {
-    margin: 0 0 10px;
-    color: #f8fafc;
-    font-size: 1rem;
-  }
-
+  .comments-wrapper { display: flex; flex-direction: column; }
+  h4 { margin: 0 0 10px; color: #f8fafc; font-size: 1rem; }
   .comment-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 100px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
+    padding-right: 4px;
   }
-
-  .comment {
-    margin: 0;
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: #020617;
-    color: #e2e8f0;
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-
-  .empty {
-    margin: 0;
-    color: #94a3b8;
-    font-size: 0.9rem;
-  }
+  .comment-list::-webkit-scrollbar { width: 4px; }
+  .comment-list::-webkit-scrollbar-track { background: transparent; }
+  .comment-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 999px; }
+  .empty { margin: 0; color: #94a3b8; font-size: 0.9rem; }
 </style>
