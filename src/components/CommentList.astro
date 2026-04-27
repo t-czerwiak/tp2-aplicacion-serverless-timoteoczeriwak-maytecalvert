@@ -1,0 +1,54 @@
+---
+import { getComments } from "../lib/api";
+
+const { bodyId } = Astro.props;
+const comments = await getComments(bodyId);
+---
+
+<div class="comments">
+  <h4>Comentarios</h4>
+
+  {comments.length === 0 ? (
+    <p class="empty">Todavía no hay comentarios.</p>
+  ) : (
+    <div class="comment-list">
+      {comments.map((comment) => (
+        <p class="comment">{comment.content}</p>
+      ))}
+    </div>
+  )}
+</div>
+
+<style>
+  .comments {
+    margin-bottom: 12px;
+  }
+
+  h4 {
+    margin: 0 0 10px;
+    color: #f8fafc;
+    font-size: 1rem;
+  }
+
+  .comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .comment {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #020617;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .empty {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.9rem;
+  }
+</style>

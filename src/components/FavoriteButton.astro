@@ -1,0 +1,46 @@
+---
+import { addFavorite } from "../lib/api";
+
+const { bodyId } = Astro.props;
+---
+
+<button class="fav-btn" data-id={bodyId}>
+  ✦ Agregar a favoritos
+</button>
+
+<script>
+  document.querySelectorAll(".fav-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      await addFavorite(id);
+
+      btn.textContent = "✓ Guardado";
+      btn.classList.add("saved");
+    });
+  });
+</script>
+
+<style>
+  .fav-btn {
+    width: fit-content;
+    padding: 10px 14px;
+    border: 1px solid rgba(129, 140, 248, 0.5);
+    border-radius: 999px;
+    background: rgba(129, 140, 248, 0.16);
+    color: #c4b5fd;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .fav-btn:hover {
+    background: rgba(129, 140, 248, 0.28);
+    color: #ffffff;
+  }
+
+  .fav-btn.saved {
+    background: rgba(34, 211, 238, 0.18);
+    border-color: rgba(34, 211, 238, 0.6);
+    color: #67e8f9;
+  }
+</style>
