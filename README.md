@@ -1,82 +1,80 @@
-Ya dejé armado el front visual con componentes separados. La conexión con back debería hacerse principalmente desde `src/lib/api.js`, porque todos los componentes consumen funciones desde ahí.
+# 🌌 NASA Space Explorer
 
-Los puntos a conectar serían:
+Aplicación web tipo museo digital del espacio, donde podés explorar cuerpos celestes con imágenes reales, guardar tus favoritos y dejar comentarios.
 
-`getAllBodies()` para traer las imágenes/cuerpos de la home.
-`addFavorite(bodyId)` y `removeFavorite(bodyId)` para favoritos.
-`getUserFavorites()` para la pantalla de favoritos.
-`getComments(bodyId)` para mostrar comentarios de cada imagen.
-`addComment(bodyId, content)` para guardar comentarios.
-`signIn(email, password)` para login.
-`signUp(email, password)` para registro.
-`signOut()` y `getUser()` para sesión.
+Desarrollada como Trabajo Práctico N°2 para la materia UX.
 
-La idea es reemplazar los mocks de `api.js` por llamadas reales a Supabase sin tocar los componentes visuales.
+---
 
+## 👥 Equipo
 
-# NASA Space Explorer
+| Integrante | Rama | Responsabilidad |
+|---|---|---|
+| Timoteo Czerwiak | `timoteo-czerwiak` | Backend: base de datos, autenticación y API con Supabase |
+| Mayte Calvert | `mayte-calvert` | Frontend: diseño, páginas y componentes con Astro |
 
+---
 
-Mayte Calvert
-Curso: 5A
+## 🚀 Stack tecnológico
 
+- **Frontend:** [Astro](https://astro.build/)
+- **Base de datos y autenticación:** [Supabase](https://supabase.com/)
+- **Deploy:** [Vercel](https://vercel.com/)
 
-# Descripción
+---
 
-El proyecto consiste en una aplicación web sobre el espacio (NASA), donde se pueden ver imágenes de cuerpos celestes, interactuar con ellas y gestionar contenido del usuario.
+## ✨ Funcionalidades
 
-El trabajo está dividido en dos partes:
-- Frontend (visual)
-- Backend (serverless)
+- Registro, inicio y cierre de sesión de usuarios
+- Exploración de cuerpos celestes con imágenes (planetas, estrellas, agujeros negros, galaxias, nebulosas)
+- Guardar cuerpos celestes como favoritos
+- Comentar en cada cuerpo celeste
+- Perfil de usuario
 
-En este caso se desarrolló la parte visual.
+---
 
+## 🗄️ Base de datos
 
+El proyecto usa Supabase con las siguientes tablas:
 
-# Qué hice
+- `celestial_bodies` — contenido del museo (nombre, categoría, descripción, imagen)
+- `profiles` — perfil de cada usuario registrado
+- `favorites` — favoritos asociados a cada usuario
+- `comments` — comentarios por cuerpo celeste y usuario
 
-- Diseño general de la página
-- Cards para mostrar imágenes del espacio
-- Estructura de componentes reutilizables
-- Pantallas de login y registro
-- Página de favoritos (estructura base)
-- Sistema de comentarios (visual)
-- Botón de favoritos (visual)
+Todos los accesos están protegidos con Row Level Security (RLS).
 
+---
 
+## ⚙️ Cómo correr el proyecto localmente
 
-# Funcionalidades
+```bash
+# Clonar el repositorio
+git clone https://github.com/t-czerwiak/tp2-aplicacion-serverless-timoteoczeriwak-maytecalvert.git
 
-- Ver imágenes del espacio organizadas en cards
-- Agregar una imagen a favoritos
-- Ver comentarios en cada imagen
-- Escribir comentarios
-- Navegar a login y register
-- Interfaz responsive básica
-
-
-# Estructura
-
-src/
-components/
-pages/
-layouts/
-lib/
-
-# Cómo ejecutar
-
-1. Entrar a la carpeta del frontend:
-
+# Entrar a la carpeta del proyecto
 cd nasa-space-explorer
 
-2. Instalar dependencias:
-
+# Instalar dependencias
 npm install
 
-3. Ejecutar el proyecto:
-
+# Correr en modo desarrollo
 npm run dev
+```
 
-4. Abrir en el navegador:
+---
 
-http://localhost:4321
+## 🌿 Estructura de ramas
+
+```
+main              ← versión estable y desplegada
+develop           ← integración de ambas partes
+timoteo-czerwiak  ← desarrollo del backend
+mayte-calvert     ← desarrollo del frontend
+```
+
+---
+
+## 🔗 Deploy
+
+La aplicación está desplegada en Vercel: [link acá cuando esté disponible]
