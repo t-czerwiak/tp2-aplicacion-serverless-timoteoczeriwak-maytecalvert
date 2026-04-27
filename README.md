@@ -77,4 +77,4 @@ mayte-calvert     ← desarrollo del frontend
 
 ## 🔗 Deploy
 
-La aplicación está desplegada en Vercel: [link acá cuando esté disponible]
+La aplicación está desplegada en Vercel: [https://nasaspaceexplorer.vercel.app/]
