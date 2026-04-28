@@ -32,14 +32,22 @@ import Header from "../components/Header.astro";
     const email = (inputs[0] as HTMLInputElement).value;
     const password = (inputs[1] as HTMLInputElement).value;
 
+    const errorMsg = document.getElementById("error-msg");
+
+    if (!email.endsWith("@gmail.com")) {
+      errorMsg.textContent = "Solo se aceptan cuentas de Gmail (@gmail.com).";
+      return;
+    }
+
     const btnEl = (e.target as HTMLFormElement).querySelector("button");
     btnEl.textContent = "Creando cuenta...";
     btnEl.disabled = true;
+    errorMsg.textContent = "";
 
     const { data, error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
-      document.getElementById("error-msg").textContent = error.message;
+      errorMsg.textContent = error.message;
       btnEl.textContent = "Registrarme";
       btnEl.disabled = false;
     } else {
