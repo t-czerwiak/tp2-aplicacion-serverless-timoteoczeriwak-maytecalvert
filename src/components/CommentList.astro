@@ -26,21 +26,80 @@ const { bodyId } = Astro.props;
       list.innerHTML = `<p class="empty">Todavía no hay comentarios.</p>`;
     } else {
       list.innerHTML = comments.map(c => `
-        <div style="padding:10px 12px;border-radius:12px;background:#020617;margin-bottom:8px;">
+        <div style="padding:10px 12px;border-radius:12px;background:#020617;margin-bottom:8px;position:relative;">
           <span style="font-size:0.75rem;color:#67e8f9;font-weight:700;">@${c.profiles?.username ?? "usuario"}</span>
           <p style="margin:4px 0 0;color:#e2e8f0;font-size:0.9rem;line-height:1.4;">${c.content}</p>
+          <div class="comment-actions" data-comment-id="${c.id}" data-user-id="${c.user_id}" style="display:none;gap:8px;margin-top:8px;">
+            <button class="edit-btn" style="padding:4px 10px;border:none;border-radius:8px;background:#818cf8;color:white;font-size:0.75rem;cursor:pointer;">Editar</button>
+            <button class="delete-btn" style="padding:4px 10px;border:none;border-radius:8px;background:#ef4444;color:white;font-size:0.75rem;cursor:pointer;">Borrar</button>
+          </div>
         </div>
       `).join("");
     }
-  }
 
-  document.querySelectorAll(".comments-wrapper[data-id]").forEach(container => {
-    loadComments(container, container.dataset.id);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      container.querySelectorAll(".comment-actions").forEach(actions => {
+        if (actions.dataset.userId === user.id) {
+          actions.style.display = "flex";
+        }
+        actions.querySelector(".delete-btn")?.addEventListener("click", async () => {
+          await supabase.from("comments").delete().eq("id", actions.dataset.commentId);
+          loadComments(container, bodyId);
+        });
+        actions.querySelector(".edit-btn")?.addEventListener("click", async () => {
+  const commentDiv = actions.parentElement;
+  const contentP = commentDiv.querySelector("p");
+  const currentText = contentP.textContent;
+  
+  contentP.style.display = "none";
+  actions.style.display = "none";
+  
+  const editContainer = document.createElement("div");
+  editContainer.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-top:8px;";
+  editContainer.innerHTML = `
+  <input type="text" value="${currentText}" style="width:100%;box-sizing:border-box;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,0.25);background:#0f172a;color:#f8fafc;font-size:0.9rem;">
+  <div style="display:flex;gap:6px;">
+    <button class="save-btn" style="flex:1;padding:6px 10px;border:none;border-radius:8px;background:#22d3ee;color:#020617;font-weight:700;cursor:pointer;font-size:0.75rem;">Guardar</button>
+    <button class="cancel-btn" style="flex:1;padding:6px 10px;border:none;border-radius:8px;background:#334155;color:white;font-weight:700;cursor:pointer;font-size:0.75rem;">Cancelar</button>
+  </div>
+`;
+  commentDiv.appendChild(editContainer);
+
+  editContainer.querySelector(".cancel-btn")?.addEventListener("click", () => {
+    contentP.style.display = "";
+    actions.style.display = "flex";
+    editContainer.remove();
   });
+
+  editContainer.querySelector(".save-btn")?.addEventListener("click", async () => {
+    const newContent = editContainer.querySelector("input").value.trim();
+    if (newContent) {
+      const { data, error } = await supabase
+        .from("comments")
+        .update({ content: newContent })
+        .eq("id", actions.dataset.commentId)
+        .select();
+      if (!error && data?.length > 0) {
+        contentP.textContent = newContent;
+        contentP.style.display = "";
+        actions.style.display = "flex";
+        editContainer.remove();
+      }
+    }
+  });
+});
+      });
+    }
+  }
 
   window.addEventListener("comment-sent", (e) => {
     const container = document.querySelector(`.comments-wrapper[data-id="${e.detail.bodyId}"]`);
     if (container) loadComments(container, e.detail.bodyId);
+  });
+
+  document.querySelectorAll<HTMLElement>(".comments-wrapper").forEach(container => {
+    loadComments(container, container.dataset.id);
   });
 </script>
 
