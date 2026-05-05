@@ -1,76 +1,65 @@
-import { supabase } from "./supabase";
+import { supabase } from './supabase'
 
-// 🔹 DATA FAKE PARA DESARROLLO
+// ---- AUTH ----
+export const signUp = (email, password) =>
+  supabase.auth.signUp({ email, password })
 
-let mockComments = {
-  1: [
-    { content: "Increíble imagen 🚀" },
-    { content: "Quiero viajar ahí 🌌" }
-  ],
-  2: [
-    { content: "La NASA siempre sorprende" }
-  ]
-};
+export const signIn = (email, password) =>
+  supabase.auth.signInWithPassword({ email, password })
 
-let mockFavorites = [];
+export const signOut = () =>
+  supabase.auth.signOut()
 
-// 🔹 FUNCIONES (MISMO NOMBRE QUE BACK)
+export const getUser = () =>
+  supabase.auth.getUser()
 
-// TRAER TODOS LOS CUERPOS
-export async function getAllBodies() {
-  return [
-    {
-      id: 1,
-      title: "Nebulosa de Orión",
-      description: "Zona de formación estelar",
-      category: "Nebulosa",
-      image_url: "https://images-assets.nasa.gov/image/PIA08653/PIA08653~medium.jpg"
-    },
-    {
-      id: 2,
-      title: "Galaxia Andrómeda",
-      description: "La galaxia más cercana",
-      category: "Galaxia",
-      image_url: "https://images-assets.nasa.gov/image/PIA04921/PIA04921~medium.jpg"
-    }
-  ];
-}
+// ---- CUERPOS CELESTES ----
+export const getAllBodies = () =>
+  supabase.from('celestial_bodies').select('*')
 
-// FAVORITOS
-export async function addFavorite(bodyId) {
-  mockFavorites.push(bodyId);
-  console.log("Favorito agregado:", bodyId);
-}
+export const getBodyById = (id) =>
+  supabase.from('celestial_bodies').select('*').eq('id', id).single()
 
-export async function removeFavorite(bodyId) {
-  mockFavorites = mockFavorites.filter(id => id !== bodyId);
-}
+export const getBodiesByCategory = (category) =>
+  supabase.from('celestial_bodies').select('*').eq('category', category)
 
-// COMENTARIOS
-export async function getComments(bodyId) {
-  return mockComments[bodyId] || [];
-}
+// ---- FAVORITOS ----
+export const addFavorite = (userId, celestialBodyId) =>
+  supabase.from('favorites').insert({ user_id: userId, celestial_body_id: celestialBodyId })
 
-export async function addComment(bodyId, content) {
-  if (!mockComments[bodyId]) {
-    mockComments[bodyId] = [];
-  }
+export const removeFavorite = (userId, celestialBodyId) =>
+  supabase.from('favorites').delete()
+    .eq('user_id', userId)
+    .eq('celestial_body_id', celestialBodyId)
 
-  mockComments[bodyId].push({ content });
+export const getUserFavorites = (userId) =>
+  supabase.from('favorites')
+    .select('*, celestial_bodies(*)')
+    .eq('user_id', userId)
 
-  console.log("Comentario agregado:", content);
-}
+// ---- COMENTARIOS ----
+export const getComments = (celestialBodyId) =>
+  supabase.from('comments')
+    .select('*, profiles(username, avatar_url)')
+    .eq('celestial_body_id', celestialBodyId)
+    .order('created_at', { ascending: false })
 
-// despues hay que cambiar estas funciones para que hagan conesión con el backend
-// return mockComments[bodyId]
-//const { data } = await supabase...
-//* getAllBodies()
-//*addFavorite(bodyId)
-//*removeFavorite(bodyId)
-//*getUserFavorites()
-//*getComments(bodyId)
-//*addComment(bodyId, content)
-//*signIn(email, password)
-//*signUp(email, password)
-//*signOut()
-//*getUser() 
+export const addComment = (userId, celestialBodyId, content) =>
+  supabase.from('comments').insert({
+    user_id: userId,
+    celestial_body_id: celestialBodyId,
+    content
+  })
+
+export const deleteComment = (commentId) =>
+  supabase.from('comments').delete().eq('id', commentId)
+
+// ---- PERFIL ----
+export const getProfile = (userId) =>
+  supabase.from('profiles').select('*').eq('id', userId).single()
+
+export const createProfile = (userId, username) =>
+  supabase.from('profiles').insert({ id: userId, username })
+
+export const updateProfile = (userId, updates) =>
+  supabase.from('profiles').update(updates).eq('id', userId)
