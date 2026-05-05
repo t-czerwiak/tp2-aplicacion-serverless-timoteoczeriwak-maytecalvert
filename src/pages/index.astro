@@ -2,34 +2,21 @@
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import ImageCard from "../components/ImageCard.astro";
+import { supabase } from "../lib/supabase";
 
-const spaceItems = [
-  {
-    id: 1,
-    title: "Nebulosa de Orión",
-    description: "Una región de formación estelar ubicada en la constelación de Orión.",
-    category: "Nebulosa",
-    image_url: "https://images-assets.nasa.gov/image/PIA08653/PIA08653~medium.jpg"
-  },
-  {
-    id: 2,
-    title: "Galaxia Andrómeda",
-    description: "La galaxia espiral más cercana a la Vía Láctea.",
-    category: "Galaxia",
-    image_url: "https://images-assets.nasa.gov/image/PIA04921/PIA04921~medium.jpg"
-  },
-  {
-    id: 3,
-    title: "Marte",
-    description: "El planeta rojo, uno de los principales objetivos de exploración espacial.",
-    category: "Planeta",
-    image_url: "https://images-assets.nasa.gov/image/PIA04591/PIA04591~medium.jpg"
-  }
-];
+
+const { data: spaceItems } = await supabase
+  .from("celestial_bodies")
+  .select("*");
+
+
+const items = spaceItems ?? [];
 ---
+
 
 <Layout title="NASA Space Explorer">
   <Header />
+
 
   <main class="container">
     <section class="hero">
@@ -37,13 +24,15 @@ const spaceItems = [
       <p>Descubrí imágenes del espacio, guardá tus favoritas y compartí comentarios.</p>
     </section>
 
+
     <section class="gallery">
-      {spaceItems.map((item) => (
+      {items.map((item) => (
         <ImageCard item={item} />
       ))}
     </section>
   </main>
 </Layout>
+
 
 <style>
 :global(body) {
@@ -53,16 +42,19 @@ const spaceItems = [
   color: #e2e8f0;
 }
 
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px 24px;
-  }
 
-  .hero {
-    text-align: center;
-    margin-bottom: 40px;
-  }
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+
+.hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
 
 .hero h1 {
   font-size: 3.2rem;
@@ -71,10 +63,12 @@ const spaceItems = [
   text-shadow: 0 0 24px rgba(129, 140, 248, 0.45);
 }
 
+
 .hero p {
   color: #cbd5e1;
   font-size: 1.1rem;
 }
+
 
 .gallery {
   display: grid;
@@ -82,3 +76,5 @@ const spaceItems = [
   gap: 24px;
 }
 </style>
+
+

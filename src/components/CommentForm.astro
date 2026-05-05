@@ -1,39 +1,54 @@
 ---
-import { addComment } from "../lib/api";
-
 const { bodyId } = Astro.props;
 ---
+
 
 <form class="comment-form" data-id={bodyId}>
   <input type="text" placeholder="Escribí un comentario..." />
   <button type="submit">Enviar</button>
 </form>
 
+
 <script>
+  import { supabase } from "../lib/supabase";
+
+
   document.querySelectorAll(".comment-form").forEach((form) => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { window.location.href = "/login"; return; }
+
+
       const input = form.querySelector("input");
       const text = input.value.trim();
-      const id = form.dataset.id;
-
+      const bodyId = form.dataset.id;
       if (!text) return;
 
-      await addComment(id, text);
 
-      input.value = "";
-      alert("Comentario enviado");
+      const { error } = await supabase.from("comments").insert({
+        user_id: user.id,
+        celestial_body_id: bodyId,
+        content: text
+      });
+
+
+      if (!error) {
+        input.value = "";
+        window.dispatchEvent(new CustomEvent("comment-sent", { detail: { bodyId } }));
+      }
     });
   });
 </script>
+
 
 <style>
   .comment-form {
     display: flex;
     gap: 8px;
   }
-
   input {
     flex: 1;
     min-width: 0;
@@ -44,11 +59,7 @@ const { bodyId } = Astro.props;
     color: #f8fafc;
     outline: none;
   }
-
-  input::placeholder {
-    color: #64748b;
-  }
-
+  input::placeholder { color: #64748b; }
   button {
     padding: 10px 14px;
     border: none;
@@ -58,8 +69,6 @@ const { bodyId } = Astro.props;
     font-weight: 700;
     cursor: pointer;
   }
-
-  button:hover {
-    background: #6366f1;
-  }
+  button:hover { background: #6366f1; }
 </style>
+
