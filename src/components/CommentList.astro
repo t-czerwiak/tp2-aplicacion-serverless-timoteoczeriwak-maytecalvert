@@ -10,15 +10,11 @@ const { bodyId } = Astro.props;
 </div>
 
 <script>
+  import { getUser, getComments, deleteComment } from "../lib/api";
   import { supabase } from "../lib/supabase";
 
   async function loadComments(container, bodyId) {
-    const { data } = await supabase
-      .from("comments")
-      .select("*, profiles(username)")
-      .eq("celestial_body_id", bodyId)
-      .order("created_at", { ascending: false });
-
+    const { data } = await getComments(bodyId);
     const list = container.querySelector(".comment-list");
     const comments = data ?? [];
 
@@ -26,69 +22,69 @@ const { bodyId } = Astro.props;
       list.innerHTML = `<p class="empty">Todavía no hay comentarios.</p>`;
     } else {
       list.innerHTML = comments.map(c => `
-        <div style="padding:10px 12px;border-radius:12px;background:#020617;margin-bottom:8px;position:relative;">
-          <span style="font-size:0.75rem;color:#67e8f9;font-weight:700;">@${c.profiles?.username ?? "usuario"}</span>
-          <p style="margin:4px 0 0;color:#e2e8f0;font-size:0.9rem;line-height:1.4;">${c.content}</p>
-          <div class="comment-actions" data-comment-id="${c.id}" data-user-id="${c.user_id}" style="display:none;gap:8px;margin-top:8px;">
-            <button class="edit-btn" style="padding:4px 10px;border:none;border-radius:8px;background:#818cf8;color:white;font-size:0.75rem;cursor:pointer;">Editar</button>
-            <button class="delete-btn" style="padding:4px 10px;border:none;border-radius:8px;background:#ef4444;color:white;font-size:0.75rem;cursor:pointer;">Borrar</button>
+        <div class="comment-item">
+          <span class="comment-author">@${c.profiles?.username ?? "usuario"}</span>
+          <p class="comment-content">${c.content}</p>
+          <div class="comment-actions" data-comment-id="${c.id}" data-user-id="${c.user_id}">
+            <button class="edit-btn">Editar</button>
+            <button class="delete-btn">Borrar</button>
           </div>
         </div>
       `).join("");
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await getUser();
     if (user) {
       container.querySelectorAll(".comment-actions").forEach(actions => {
         if (actions.dataset.userId === user.id) {
-          actions.style.display = "flex";
+          actions.classList.add("visible");
         }
         actions.querySelector(".delete-btn")?.addEventListener("click", async () => {
-          await supabase.from("comments").delete().eq("id", actions.dataset.commentId);
+          await deleteComment(actions.dataset.commentId);
           loadComments(container, bodyId);
         });
         actions.querySelector(".edit-btn")?.addEventListener("click", async () => {
-  const commentDiv = actions.parentElement;
-  const contentP = commentDiv.querySelector("p");
-  const currentText = contentP.textContent;
-  
-  contentP.style.display = "none";
-  actions.style.display = "none";
-  
-  const editContainer = document.createElement("div");
-  editContainer.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-top:8px;";
-  editContainer.innerHTML = `
-  <input type="text" value="${currentText}" style="width:100%;box-sizing:border-box;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,0.25);background:#0f172a;color:#f8fafc;font-size:0.9rem;">
-  <div style="display:flex;gap:6px;">
-    <button class="save-btn" style="flex:1;padding:6px 10px;border:none;border-radius:8px;background:#22d3ee;color:#020617;font-weight:700;cursor:pointer;font-size:0.75rem;">Guardar</button>
-    <button class="cancel-btn" style="flex:1;padding:6px 10px;border:none;border-radius:8px;background:#334155;color:white;font-weight:700;cursor:pointer;font-size:0.75rem;">Cancelar</button>
-  </div>
-`;
-  commentDiv.appendChild(editContainer);
+          const commentDiv = actions.parentElement;
+          const contentP = commentDiv.querySelector(".comment-content");
+          const currentText = contentP.textContent;
 
-  editContainer.querySelector(".cancel-btn")?.addEventListener("click", () => {
-    contentP.style.display = "";
-    actions.style.display = "flex";
-    editContainer.remove();
-  });
+          contentP.style.display = "none";
+          actions.classList.remove("visible");
 
-  editContainer.querySelector(".save-btn")?.addEventListener("click", async () => {
-    const newContent = editContainer.querySelector("input").value.trim();
-    if (newContent) {
-      const { data, error } = await supabase
-        .from("comments")
-        .update({ content: newContent })
-        .eq("id", actions.dataset.commentId)
-        .select();
-      if (!error && data?.length > 0) {
-        contentP.textContent = newContent;
-        contentP.style.display = "";
-        actions.style.display = "flex";
-        editContainer.remove();
-      }
-    }
-  });
-});
+          const editContainer = document.createElement("div");
+          editContainer.className = "edit-container";
+          editContainer.innerHTML = `
+            <input class="edit-input" type="text" value="${currentText}" />
+            <div class="edit-actions">
+              <button class="save-btn">Guardar</button>
+              <button class="cancel-btn">Cancelar</button>
+            </div>
+          `;
+          commentDiv.appendChild(editContainer);
+
+          editContainer.querySelector(".cancel-btn")?.addEventListener("click", () => {
+            contentP.style.display = "";
+            actions.classList.add("visible");
+            editContainer.remove();
+          });
+
+          editContainer.querySelector(".save-btn")?.addEventListener("click", async () => {
+            const newContent = editContainer.querySelector(".edit-input").value.trim();
+            if (newContent) {
+              const { data, error } = await supabase
+                .from("comments")
+                .update({ content: newContent })
+                .eq("id", actions.dataset.commentId)
+                .select();
+              if (!error && data?.length > 0) {
+                contentP.textContent = newContent;
+                contentP.style.display = "";
+                actions.classList.add("visible");
+                editContainer.remove();
+              }
+            }
+          });
+        });
       });
     }
   }
@@ -98,25 +94,106 @@ const { bodyId } = Astro.props;
     if (container) loadComments(container, e.detail.bodyId);
   });
 
-  document.querySelectorAll<HTMLElement>(".comments-wrapper").forEach(container => {
+  document.querySelectorAll(".comments-wrapper").forEach(container => {
     loadComments(container, container.dataset.id);
   });
 </script>
 
 <style>
   .comments-wrapper { display: flex; flex-direction: column; }
+
   h4 { margin: 0 0 10px; color: #f8fafc; font-size: 1rem; }
+
   .comment-list {
     flex: 1;
     overflow-y: auto;
-    max-height: 100px;
+    max-height: 200px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
     padding-right: 4px;
   }
+
   .comment-list::-webkit-scrollbar { width: 4px; }
   .comment-list::-webkit-scrollbar-track { background: transparent; }
   .comment-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 999px; }
+
+  .comment-item {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #020617;
+    position: relative;
+  }
+
+  .comment-author {
+    font-size: 0.75rem;
+    color: #67e8f9;
+    font-weight: 700;
+  }
+
+  .comment-content {
+    margin: 4px 0 0;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .comment-actions {
+    display: none;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .comment-actions.visible {
+    display: flex;
+  }
+
+  .edit-btn, .delete-btn {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  .edit-btn { background: #818cf8; color: white; }
+  .delete-btn { background: #ef4444; color: white; }
+
+  .edit-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .edit-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    background: #0f172a;
+    color: #f8fafc;
+    font-size: 0.9rem;
+  }
+
+  .edit-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .save-btn, .cancel-btn {
+    flex: 1;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.75rem;
+  }
+
+  .save-btn { background: #22d3ee; color: #020617; }
+  .cancel-btn { background: #334155; color: white; }
+
   .empty { margin: 0; color: #94a3b8; font-size: 0.9rem; }
 </style>
