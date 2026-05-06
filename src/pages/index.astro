@@ -2,12 +2,9 @@
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import ImageCard from "../components/ImageCard.astro";
-import { supabase } from "../lib/supabase";
+import { getAllBodies } from "../lib/api";
 
-const { data: spaceItems } = await supabase
-  .from("celestial_bodies")
-  .select("*");
-
+const { data: spaceItems } = await getAllBodies();
 const items = spaceItems ?? [];
 ---
 
