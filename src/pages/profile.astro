@@ -22,18 +22,12 @@ import Header from "../components/Header.astro";
 </Layout>
 
 <script>
-  import { supabase } from "../lib/supabase";
+  import { getUser, getProfile, updateProfile } from "../lib/api";
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    window.location.href = "/login";
-  }
+  const { data: { user } } = await getUser();
+  if (!user) window.location.href = "/login";
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", user.id)
-    .single();
+  const { data: profile } = await getProfile(user.id);
 
   const input = document.getElementById("username") as HTMLInputElement;
   if (profile?.username) input.value = profile.username;
@@ -49,10 +43,7 @@ import Header from "../components/Header.astro";
     btn.textContent = "Guardando...";
     btn.disabled = true;
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({ username })
-      .eq("id", user.id);
+    const { error } = await updateProfile(user.id, { username });
 
     if (error) {
       msg.style.color = "#f87171";
@@ -92,14 +83,8 @@ import Header from "../components/Header.astro";
     box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
   }
 
-  h1 {
-    margin: 0 0 8px;
-    color: #f8fafc;
-  }
-
-  p {
-    color: #94a3b8;
-  }
+  h1 { margin: 0 0 8px; color: #f8fafc; }
+  p { color: #94a3b8; }
 
   form {
     display: flex;
@@ -108,11 +93,7 @@ import Header from "../components/Header.astro";
     margin: 24px 0 0;
   }
 
-  label {
-    font-size: 0.85rem;
-    color: #94a3b8;
-    margin-bottom: -6px;
-  }
+  label { font-size: 0.85rem; color: #94a3b8; margin-bottom: -6px; }
 
   input {
     padding: 13px;

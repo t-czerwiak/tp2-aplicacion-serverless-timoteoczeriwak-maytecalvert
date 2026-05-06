@@ -3,21 +3,12 @@ import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import CommentList from "../components/CommentList.astro";
 import FavoriteButton from "../components/FavoriteButton.astro";
-import { supabase } from "../lib/supabase";
+import { getBodyById, getComments } from "../lib/api";
 
 const { id } = Astro.params;
 
-const { data: body } = await supabase
-  .from("celestial_bodies")
-  .select("*")
-  .eq("id", id)
-  .single();
-
-const { data: comments } = await supabase
-  .from("comments")
-  .select("*, profiles(username)")
-  .eq("celestial_body_id", id)
-  .order("created_at", { ascending: false });
+const { data: body } = await getBodyById(id);
+const { data: comments } = await getComments(id);
 
 const safeComments = comments ?? [];
 

@@ -12,11 +12,10 @@
 </header>
 
 <script>
-  import { supabase } from "../lib/supabase";
+  import { getUser, signOut } from "../lib/api";
 
   const authLink = document.getElementById("auth-link");
-
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await getUser();
 
   if (user && authLink) {
     const profileLink = document.createElement("a");
@@ -29,7 +28,7 @@
     authLink.classList.add("logout-btn");
     authLink.addEventListener("click", async (e) => {
       e.preventDefault();
-      await supabase.auth.signOut();
+      await signOut();
       window.location.href = "/";
     });
   }
