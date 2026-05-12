@@ -14,15 +14,21 @@ const { bodyId } = Astro.props;
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const { data: { user } } = await getUser();
-      if (!user) { window.location.href = "/login"; return; }
-
+      const btn = form.querySelector("button");
       const input = form.querySelector("input");
+      if (btn.disabled) return;
+      btn.disabled = true;
+
+      const { data: { user } } = await getUser();
+      if (!user) { btn.disabled = false; window.location.href = "/login"; return; }
+
       const text = input.value.trim();
       const bodyId = form.dataset.id;
-      if (!text) return;
+      if (!text) { btn.disabled = false; return; }
 
       const { error } = await addComment(user.id, bodyId, text);
+
+      btn.disabled = false;
 
       if (!error) {
         input.value = "";
@@ -58,4 +64,5 @@ const { bodyId } = Astro.props;
     cursor: pointer;
   }
   button:hover { background: #6366f1; }
+  button:disabled { background: #334155; cursor: not-allowed; }
 </style>

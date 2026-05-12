@@ -24,6 +24,9 @@ export const getBodiesByCategory = (category) =>
   supabase.from('celestial_bodies').select('*').eq('category', category)
 
 // ---- FAVORITOS ----
+export const checkFavorite = (userId, celestialBodyId) =>
+  supabase.from('favorites').select('id').eq('user_id', userId).eq('celestial_body_id', celestialBodyId).maybeSingle()
+
 export const addFavorite = (userId, celestialBodyId) =>
   supabase.from('favorites').insert({ user_id: userId, celestial_body_id: celestialBodyId })
 
@@ -51,8 +54,11 @@ export const addComment = (userId, celestialBodyId, content) =>
     content
   })
 
-export const deleteComment = (commentId) =>
-  supabase.from('comments').delete().eq('id', commentId)
+export const deleteComment = (commentId, userId) =>
+  supabase.from('comments').delete().eq('id', commentId).eq('user_id', userId)
+
+export const updateComment = (commentId, userId, content) =>
+  supabase.from('comments').update({ content }).eq('id', commentId).eq('user_id', userId).select()
 
 // ---- PERFIL ----
 export const getProfile = (userId) =>
