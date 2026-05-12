@@ -10,8 +10,7 @@ const { bodyId } = Astro.props;
 </div>
 
 <script>
-  import { getUser, getComments, deleteComment } from "../lib/api";
-  import { supabase } from "../lib/supabase";
+  import { getUser, getComments, deleteComment, updateComment } from "../lib/api";
 
   async function loadComments(container, bodyId) {
     const { data } = await getComments(bodyId);
@@ -36,13 +35,15 @@ const { bodyId } = Astro.props;
     const { data: { user } } = await getUser();
     if (user) {
       container.querySelectorAll(".comment-actions").forEach(actions => {
-        if (actions.dataset.userId === user.id) {
-          actions.classList.add("visible");
-        }
+        if (actions.dataset.userId !== user.id) return;
+
+        actions.classList.add("visible");
+
         actions.querySelector(".delete-btn")?.addEventListener("click", async () => {
-          await deleteComment(actions.dataset.commentId);
+          await deleteComment(actions.dataset.commentId, user.id);
           loadComments(container, bodyId);
         });
+
         actions.querySelector(".edit-btn")?.addEventListener("click", async () => {
           const commentDiv = actions.parentElement;
           const contentP = commentDiv.querySelector(".comment-content");
@@ -71,11 +72,7 @@ const { bodyId } = Astro.props;
           editContainer.querySelector(".save-btn")?.addEventListener("click", async () => {
             const newContent = editContainer.querySelector(".edit-input").value.trim();
             if (newContent) {
-              const { data, error } = await supabase
-                .from("comments")
-                .update({ content: newContent })
-                .eq("id", actions.dataset.commentId)
-                .select();
+              const { data, error } = await updateComment(actions.dataset.commentId, user.id, newContent);
               if (!error && data?.length > 0) {
                 contentP.textContent = newContent;
                 contentP.style.display = "";
@@ -99,7 +96,7 @@ const { bodyId } = Astro.props;
   });
 </script>
 
-<style>
+<style is:global>
   .comments-wrapper { display: flex; flex-direction: column; }
 
   h4 { margin: 0 0 10px; color: #f8fafc; font-size: 1rem; }

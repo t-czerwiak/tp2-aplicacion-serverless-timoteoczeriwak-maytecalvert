@@ -3,34 +3,48 @@ const { bodyId } = Astro.props;
 ---
 
 <button class="fav-btn" data-id={bodyId}>
-  ✦ Agregar a favoritos
+  Cargando...
 </button>
 
 <script>
-  import { getUser, addFavorite } from "../lib/api";
+  import { getUser, checkFavorite, addFavorite, removeFavorite } from "../lib/api";
 
-  document.querySelectorAll(".fav-btn").forEach((btn) => {
+  document.querySelectorAll(".fav-btn").forEach(async (btn) => {
+    const bodyId = btn.dataset.id;
+    const { data: { user } } = await getUser();
+
+    if (!user) {
+      btn.textContent = "+ Agregar a favoritos";
+      btn.addEventListener("click", () => { window.location.href = "/login"; });
+      return;
+    }
+
+    const { data: existing } = await checkFavorite(user.id, bodyId);
+
+    function setSaved() {
+      btn.textContent = "Guardado";
+      btn.classList.add("saved");
+    }
+
+    function setUnsaved() {
+      btn.textContent = "+ Agregar a favoritos";
+      btn.classList.remove("saved");
+    }
+
+    existing ? setSaved() : setUnsaved();
+
     btn.addEventListener("click", async () => {
-      const { data: { user } } = await getUser();
+      btn.disabled = true;
 
-      if (!user) {
-        window.location.href = "/login";
-        return;
-      }
-
-      const bodyId = btn.dataset.id;
-      const { error } = await addFavorite(user.id, bodyId);
-
-      if (error) {
-        if (error.code === "23505") {
-          btn.textContent = "✓ Ya guardado";
-        } else {
-          console.error(error.message);
-        }
+      if (btn.classList.contains("saved")) {
+        await removeFavorite(user.id, bodyId);
+        setUnsaved();
       } else {
-        btn.textContent = "✓ Guardado";
-        btn.classList.add("saved");
+        await addFavorite(user.id, bodyId);
+        setSaved();
       }
+
+      btn.disabled = false;
     });
   });
 </script>
@@ -38,22 +52,36 @@ const { bodyId } = Astro.props;
 <style>
   .fav-btn {
     width: fit-content;
-    padding: 10px 14px;
+    padding: 10px 16px;
     border: 1px solid rgba(129, 140, 248, 0.5);
     border-radius: 999px;
     background: rgba(129, 140, 248, 0.16);
     color: #c4b5fd;
     font-weight: 700;
+    font-size: 0.875rem;
     cursor: pointer;
-    transition: 0.2s ease;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
   }
-  .fav-btn:hover {
+
+  .fav-btn:hover:not(:disabled) {
     background: rgba(129, 140, 248, 0.28);
     color: #ffffff;
   }
+
   .fav-btn.saved {
     background: rgba(34, 211, 238, 0.18);
     border-color: rgba(34, 211, 238, 0.6);
     color: #67e8f9;
+  }
+
+  .fav-btn.saved:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #f87171;
+  }
+
+  .fav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 </style>
