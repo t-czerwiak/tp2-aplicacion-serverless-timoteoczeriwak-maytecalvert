@@ -25,6 +25,7 @@ import Header from "../components/Header.astro";
 
 <script>
   import { signUp, createProfile } from "../lib/api";
+  import { validateRegisterEmail, validatePassword } from "../lib/validation";
 
   document.querySelector("form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -34,8 +35,15 @@ import Header from "../components/Header.astro";
 
     const errorMsg = document.getElementById("error-msg");
 
-    if (!email.endsWith("@gmail.com")) {
-      errorMsg.textContent = "Solo se aceptan cuentas de Gmail (@gmail.com).";
+    const emailCheck = validateRegisterEmail(email);
+    if (!emailCheck.valid) {
+      errorMsg.textContent = emailCheck.error;
+      return;
+    }
+
+    const passwordCheck = validatePassword(password);
+    if (!passwordCheck.valid) {
+      errorMsg.textContent = passwordCheck.error;
       return;
     }
 
