@@ -5,9 +5,7 @@ import CommentList from "../components/CommentList.astro";
 import FavoriteButton from "../components/FavoriteButton.astro";
 import { supabase } from "../lib/supabase";
 
-
 const { id } = Astro.params;
-
 
 const { data: body } = await supabase
   .from("celestial_bodies")
@@ -15,20 +13,16 @@ const { data: body } = await supabase
   .eq("id", id)
   .single();
 
-
 const { data: comments } = await supabase
   .from("comments")
   .select("*, profiles(username)")
   .eq("celestial_body_id", id)
   .order("created_at", { ascending: false });
 
-
 const safeComments = comments ?? [];
-
 
 if (!body) return Astro.redirect("/");
 ---
-
 
 <Layout title={body.name}>
   <Header />
@@ -45,7 +39,6 @@ if (!body) return Astro.redirect("/");
     <CommentList comments={safeComments} bodyId={body.id} />
   </main>
 </Layout>
-
 
 <style>
 .container {
@@ -81,5 +74,3 @@ if (!body) return Astro.redirect("/");
   line-height: 1.6;
 }
 </style>
-
-

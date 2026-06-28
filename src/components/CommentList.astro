@@ -2,7 +2,6 @@
 const { bodyId } = Astro.props;
 ---
 
-
 <div class="comments-wrapper" data-id={bodyId}>
   <h4>Comentarios</h4>
   <div class="comment-list">
@@ -10,10 +9,8 @@ const { bodyId } = Astro.props;
   </div>
 </div>
 
-
 <script>
   import { supabase } from "../lib/supabase";
-
 
   async function loadComments(container, bodyId) {
     const { data } = await supabase
@@ -22,10 +19,8 @@ const { bodyId } = Astro.props;
       .eq("celestial_body_id", bodyId)
       .order("created_at", { ascending: false });
 
-
     const list = container.querySelector(".comment-list");
     const comments = data ?? [];
-
 
     if (comments.length === 0) {
       list.innerHTML = `<p class="empty">Todavía no hay comentarios.</p>`;
@@ -42,7 +37,6 @@ const { bodyId } = Astro.props;
       `).join("");
     }
 
-
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       container.querySelectorAll(".comment-actions").forEach(actions => {
@@ -57,10 +51,10 @@ const { bodyId } = Astro.props;
   const commentDiv = actions.parentElement;
   const contentP = commentDiv.querySelector("p");
   const currentText = contentP.textContent;
- 
+  
   contentP.style.display = "none";
   actions.style.display = "none";
- 
+  
   const editContainer = document.createElement("div");
   editContainer.style.cssText = "display:flex;flex-direction:column;gap:6px;margin-top:8px;";
   editContainer.innerHTML = `
@@ -72,13 +66,11 @@ const { bodyId } = Astro.props;
 `;
   commentDiv.appendChild(editContainer);
 
-
   editContainer.querySelector(".cancel-btn")?.addEventListener("click", () => {
     contentP.style.display = "";
     actions.style.display = "flex";
     editContainer.remove();
   });
-
 
   editContainer.querySelector(".save-btn")?.addEventListener("click", async () => {
     const newContent = editContainer.querySelector("input").value.trim();
@@ -101,18 +93,15 @@ const { bodyId } = Astro.props;
     }
   }
 
-
   window.addEventListener("comment-sent", (e) => {
     const container = document.querySelector(`.comments-wrapper[data-id="${e.detail.bodyId}"]`);
     if (container) loadComments(container, e.detail.bodyId);
   });
 
-
   document.querySelectorAll<HTMLElement>(".comments-wrapper").forEach(container => {
     loadComments(container, container.dataset.id);
   });
 </script>
-
 
 <style>
   .comments-wrapper { display: flex; flex-direction: column; }
@@ -131,5 +120,3 @@ const { bodyId } = Astro.props;
   .comment-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 999px; }
   .empty { margin: 0; color: #94a3b8; font-size: 0.9rem; }
 </style>
-
-

@@ -3,14 +3,11 @@ import FavoriteButton from "./FavoriteButton.astro";
 import CommentList from "./CommentList.astro";
 import CommentForm from "./CommentForm.astro";
 
-
 const { item } = Astro.props;
 ---
 
-
 <article class="card">
   <img class="card-image" src={item.image_url} alt={item.name ?? item.title} />
-
 
   <div class="content">
     <div class="text-content">
@@ -19,9 +16,7 @@ const { item } = Astro.props;
       <p>{item.description}</p>
     </div>
 
-
     <FavoriteButton bodyId={item.id} />
-
 
     <section class="comments-box">
       <CommentList bodyId={item.id} />
@@ -29,7 +24,6 @@ const { item } = Astro.props;
     </section>
   </div>
 </article>
-
 
 <style>
   .card {
@@ -44,12 +38,10 @@ const { item } = Astro.props;
     overflow: hidden;
   }
 
-
   .card:hover {
     transform: translateY(-6px);
     box-shadow: 0 24px 55px rgba(0, 0, 0, 0.45);
   }
-
 
   .card-image {
     width: 100%;
@@ -60,7 +52,6 @@ const { item } = Astro.props;
     border-radius: 22px 22px 0 0;
   }
 
-
   .content {
     padding: 20px;
     padding-bottom: 24px;
@@ -70,13 +61,11 @@ const { item } = Astro.props;
     flex: 1;
   }
 
-
   .text-content {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
-
 
  .category {
   width: fit-content;
@@ -88,13 +77,11 @@ const { item } = Astro.props;
   font-weight: 700;
  }
 
-
   h3 {
   margin: 0;
   color: #f8fafc;
   font-size: 1.35rem;
   }
-
 
   p {
     margin: 0;
@@ -102,11 +89,8 @@ const { item } = Astro.props;
     line-height: 1.5;
   }
 
-
   .comments-box {
     padding-top: 16px;
     border-top: 1px solid rgba(148, 163, 184, 0.18);
   }
 </style>
-
-

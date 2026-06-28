@@ -3,16 +3,13 @@ import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 ---
 
-
 <Layout title="Mi perfil | NASA Explorer">
   <Header />
-
 
   <main class="page">
     <section class="auth-card">
       <h1>Mi perfil</h1>
       <p>Cambiá tu nombre de usuario.</p>
-
 
       <form class="profile-form">
         <label for="username">Nombre de usuario</label>
@@ -24,16 +21,14 @@ import Header from "../components/Header.astro";
   </main>
 </Layout>
 
-
 <script>
   import { supabase } from "../lib/supabase";
-
+  import { validateUsername } from "../lib/validation";
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     window.location.href = "/login";
   }
-
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -41,10 +36,8 @@ import Header from "../components/Header.astro";
     .eq("id", user.id)
     .single();
 
-
   const input = document.getElementById("username") as HTMLInputElement;
   if (profile?.username) input.value = profile.username;
-
 
   document.querySelector("form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -52,19 +45,20 @@ import Header from "../components/Header.astro";
     const msg = document.getElementById("msg");
     const btn = (e.target as HTMLFormElement).querySelector("button");
 
-
-    if (!username) return;
-
+    const usernameCheck = validateUsername(username);
+    if (!usernameCheck.valid) {
+      msg.style.color = "#f87171";
+      msg.textContent = usernameCheck.error;
+      return;
+    }
 
     btn.textContent = "Guardando...";
     btn.disabled = true;
-
 
     const { error } = await supabase
       .from("profiles")
       .update({ username })
       .eq("id", user.id);
-
 
     if (error) {
       msg.style.color = "#f87171";
@@ -74,12 +68,10 @@ import Header from "../components/Header.astro";
       msg.textContent = "¡Username actualizado!";
     }
 
-
     btn.textContent = "Guardar cambios";
     btn.disabled = false;
   });
 </script>
-
 
 <style>
   :global(body) {
@@ -89,14 +81,12 @@ import Header from "../components/Header.astro";
     color: #e2e8f0;
   }
 
-
   .page {
     min-height: calc(100vh - 80px);
     display: grid;
     place-items: center;
     padding: 24px;
   }
-
 
   .auth-card {
     width: 100%;
@@ -108,17 +98,14 @@ import Header from "../components/Header.astro";
     box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
   }
 
-
   h1 {
     margin: 0 0 8px;
     color: #f8fafc;
   }
 
-
   p {
     color: #94a3b8;
   }
-
 
   form {
     display: flex;
@@ -127,13 +114,11 @@ import Header from "../components/Header.astro";
     margin: 24px 0 0;
   }
 
-
   label {
     font-size: 0.85rem;
     color: #94a3b8;
     margin-bottom: -6px;
   }
-
 
   input {
     padding: 13px;
@@ -142,7 +127,6 @@ import Header from "../components/Header.astro";
     background: #020617;
     color: #f8fafc;
   }
-
 
   button {
     padding: 13px;
@@ -154,7 +138,3 @@ import Header from "../components/Header.astro";
     cursor: pointer;
   }
 </style>
-
-
-
-

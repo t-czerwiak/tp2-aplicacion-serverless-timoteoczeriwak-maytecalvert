@@ -3,7 +3,6 @@ import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 ---
 
-
 <Layout title="Favoritos | NASA Explorer">
   <Header />
   <main class="page">
@@ -14,16 +13,12 @@ import Header from "../components/Header.astro";
   </main>
 </Layout>
 
-
 <script>
   import { supabase } from "../lib/supabase";
 
-
   const content = document.getElementById("content");
 
-
   const { data: { user } } = await supabase.auth.getUser();
-
 
   if (!user) {
     content.innerHTML = `<p class="empty">Tenés que <a href="/login">iniciar sesión</a> para ver tus favoritos.</p>`;
@@ -34,15 +29,12 @@ import Header from "../components/Header.astro";
         .select("id, celestial_bodies(*)")
         .eq("user_id", user.id);
 
-
       const favs = data ?? [];
-
 
       if (favs.length === 0) {
         content.innerHTML = `<p class="empty">Todavía no guardaste ningún favorito.</p>`;
         return;
       }
-
 
       content.innerHTML = `
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
@@ -60,7 +52,6 @@ import Header from "../components/Header.astro";
         </div>
       `;
 
-
       content.querySelectorAll(".remove-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           await supabase.from("favorites").delete().eq("id", btn.dataset.favId);
@@ -69,11 +60,9 @@ import Header from "../components/Header.astro";
       });
     }
 
-
     loadFavorites();
   }
 </script>
-
 
 <style>
   :global(body) {
@@ -119,5 +108,3 @@ import Header from "../components/Header.astro";
   .empty { color: #94a3b8; }
   .empty a { color: #67e8f9; }
 </style>
-
-

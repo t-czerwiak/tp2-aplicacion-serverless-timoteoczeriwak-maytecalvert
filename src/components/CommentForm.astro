@@ -2,38 +2,34 @@
 const { bodyId } = Astro.props;
 ---
 
-
 <form class="comment-form" data-id={bodyId}>
   <input type="text" placeholder="Escribí un comentario..." />
   <button type="submit">Enviar</button>
 </form>
 
-
 <script>
   import { supabase } from "../lib/supabase";
-
+  import { validateCommentInput } from "../lib/validation";
 
   document.querySelectorAll(".comment-form").forEach((form) => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = "/login"; return; }
-
 
       const input = form.querySelector("input");
       const text = input.value.trim();
       const bodyId = form.dataset.id;
-      if (!text) return;
 
+      const check = validateCommentInput(text);
+      if (!check.valid) return;
 
       const { error } = await supabase.from("comments").insert({
         user_id: user.id,
         celestial_body_id: bodyId,
         content: text
       });
-
 
       if (!error) {
         input.value = "";
@@ -42,7 +38,6 @@ const { bodyId } = Astro.props;
     });
   });
 </script>
-
 
 <style>
   .comment-form {
@@ -71,4 +66,3 @@ const { bodyId } = Astro.props;
   }
   button:hover { background: #6366f1; }
 </style>
-
