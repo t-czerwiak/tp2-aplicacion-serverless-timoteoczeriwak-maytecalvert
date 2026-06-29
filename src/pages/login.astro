@@ -26,25 +26,36 @@ import Header from "../components/Header.astro";
 <script>
   import { supabase } from "../lib/supabase";
 
-  document.querySelector("form")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const inputs = (e.target as HTMLFormElement).querySelectorAll("input");
-    const email = (inputs[0] as HTMLInputElement).value;
-    const password = (inputs[1] as HTMLInputElement).value;
+  const form = document.querySelector("form");
+  const errorMsg = document.getElementById("error-msg");
 
-    const btnEl = (e.target as HTMLFormElement).querySelector("button");
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formEl = e.currentTarget as HTMLFormElement;
+    const emailInput = formEl.querySelector('input[type="email"]') as HTMLInputElement;
+    const passwordInput = formEl.querySelector('input[type="password"]') as HTMLInputElement;
+    const btnEl = formEl.querySelector("button") as HTMLButtonElement;
+
+    const email = emailInput.value;
+    const password = passwordInput.value;
+
     btnEl.textContent = "Ingresando...";
     btnEl.disabled = true;
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
-      document.getElementById("error-msg").textContent = error.message;
+      if (errorMsg) errorMsg.textContent = error.message;
       btnEl.textContent = "Ingresar";
       btnEl.disabled = false;
-    } else {
-      window.location.href = "/";
+      return;
     }
+
+    window.location.href = "/";
   });
 </script>
 

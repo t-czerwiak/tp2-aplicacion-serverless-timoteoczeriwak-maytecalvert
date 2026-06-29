@@ -25,52 +25,72 @@ import Header from "../components/Header.astro";
   import { supabase } from "../lib/supabase";
   import { validateUsername } from "../lib/validation";
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    window.location.href = "/login";
-  }
+  async function initProfile() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", user.id)
-    .single();
-
-  const input = document.getElementById("username") as HTMLInputElement;
-  if (profile?.username) input.value = profile.username;
-
-  document.querySelector("form")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const username = input.value.trim();
-    const msg = document.getElementById("msg");
-    const btn = (e.target as HTMLFormElement).querySelector("button");
-
-    const usernameCheck = validateUsername(username);
-    if (!usernameCheck.valid) {
-      msg.style.color = "#f87171";
-      msg.textContent = usernameCheck.error;
+    if (!user) {
+      window.location.href = "/login";
       return;
     }
 
-    btn.textContent = "Guardando...";
-    btn.disabled = true;
+    const input = document.getElementById("username") as HTMLInputElement | null;
+    const msg = document.getElementById("msg");
+    const form = document.querySelector(".profile-form") as HTMLFormElement | null;
 
-    const { error } = await supabase
+    if (!input || !msg || !form) return;
+
+    const { data: profile } = await supabase
       .from("profiles")
-      .update({ username })
-      .eq("id", user.id);
+      .select("username")
+      .eq("id", user.id)
+      .maybeSingle();
 
-    if (error) {
-      msg.style.color = "#f87171";
-      msg.textContent = error.message;
-    } else {
-      msg.style.color = "#4ade80";
-      msg.textContent = "¡Username actualizado!";
+    if (profile?.username) {
+      input.value = profile.username;
     }
 
-    btn.textContent = "Guardar cambios";
-    btn.disabled = false;
-  });
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = input.value.trim();
+      const btn = form.querySelector("button") as HTMLButtonElement | null;
+
+      if (!btn) return;
+
+      const usernameCheck = validateUsername(username);
+
+      if (!usernameCheck.valid) {
+        msg.style.color = "#f87171";
+        msg.textContent = usernameCheck.error ?? "Username inválido";
+        return;
+      }
+
+      btn.textContent = "Guardando...";
+      btn.disabled = true;
+
+      const { error } = await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          username,
+        });
+
+      if (error) {
+        msg.style.color = "#f87171";
+        msg.textContent = error.message;
+      } else {
+        msg.style.color = "#4ade80";
+        msg.textContent = "¡Username actualizado!";
+      }
+
+      btn.textContent = "Guardar cambios";
+      btn.disabled = false;
+    });
+  }
+
+  initProfile();
 </script>
 
 <style>

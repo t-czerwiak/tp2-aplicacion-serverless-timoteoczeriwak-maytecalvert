@@ -1,0 +1,162 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import CommentList from "../../components/CommentList.astro";
+import FavoriteButton from "../../components/FavoriteButton.astro";
+import { supabase } from "../../lib/supabase";
+
+export async function getStaticPaths() {
+  const { data: bodies, error } = await supabase
+    .from("celestial_bodies")
+    .select("id");
+
+  if (error || !bodies) {
+    console.error("Error cargando rutas dinámicas:", error);
+    return [];
+  }
+
+  return bodies.map((body) => ({
+    params: {
+      id: String(body.id),
+    },
+  }));
+}
+
+const { id } = Astro.params;
+
+const { data: body, error: bodyError } = await supabase
+  .from("celestial_bodies")
+  .select("*")
+  .eq("id", id)
+  .single();
+
+if (bodyError || !body) {
+  return Astro.redirect("/");
+}
+
+const { data: comments, error: commentsError } = await supabase
+  .from("comments")
+  .select("*, profiles(username)")
+  .eq("celestial_body_id", id)
+  .order("created_at", { ascending: false });
+
+if (commentsError) {
+  console.error("Error cargando comentarios:", commentsError);
+}
+
+const safeComments = comments ?? [];
+---
+
+<Layout title={body.name}>
+  <Header />
+
+  <main class="container">
+    <div class="image-detail">
+      <img src={body.image_url} alt={body.name} />
+
+      <div class="info">
+        <h1>{body.name}</h1>
+        <span class="category">{body.category}</span>
+        <p>{body.description}</p>
+
+        <FavoriteButton bodyId={body.id} />
+      </div>
+    </div>
+
+    <CommentList comments={safeComments} bodyId={body.id} />
+  </main>
+</Layout>
+
+<style>
+  :global(body) {
+    margin: 0;
+    background: #080d20;
+    color: #f8fafc;
+    font-family: "Segoe UI", sans-serif;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 72px 24px;
+  }
+
+  .image-detail {
+    display: grid;
+    grid-template-columns: minmax(320px, 560px) 1fr;
+    gap: 48px;
+    align-items: center;
+    margin-bottom: 56px;
+  }
+
+  .image-detail img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 24px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+    background: #020617;
+  }
+
+  .info {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
+  }
+
+  .info h1 {
+    font-size: clamp(2.3rem, 5vw, 4.5rem);
+    line-height: 1;
+    color: #f8fafc;
+    margin: 0 0 16px;
+    text-shadow: 0 0 24px rgba(129, 140, 248, 0.25);
+  }
+
+  .category {
+    display: inline-flex;
+    align-items: center;
+    background: #0e7490;
+    color: #67e8f9;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    margin-bottom: 22px;
+  }
+
+  .info p {
+    color: #cbd5e1;
+    margin: 0 0 24px;
+    line-height: 1.8;
+    font-size: 1.08rem;
+    max-width: 620px;
+  }
+
+  :global(.comments),
+  :global(.comment-list) {
+    color: #f8fafc;
+  }
+
+  :global(h2),
+  :global(h3) {
+    color: #f8fafc;
+  }
+
+  @media (max-width: 900px) {
+    .container {
+      padding: 40px 18px;
+    }
+
+    .image-detail {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    .info {
+      padding: 24px;
+    }
+  }
+</style>
