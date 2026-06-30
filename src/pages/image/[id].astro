@@ -18,16 +18,20 @@ if (!body) return Astro.redirect("/");
 
 <Layout title={body.name}>
   <Header />
+
   <main class="container">
     <div class="image-detail">
       <img src={body.image_url} alt={body.name} />
+
       <div class="info">
         <h1>{body.name}</h1>
         <span class="category">{body.category}</span>
         <p>{body.description}</p>
+
         <FavoriteButton bodyId={body.id} />
       </div>
     </div>
+
     <div class="comments-section">
       <CommentList bodyId={body.id} />
       <CommentForm bodyId={body.id} />
@@ -36,54 +40,71 @@ if (!body) return Astro.redirect("/");
 </Layout>
 
 <style>
+  :global(body) {
+    margin: 0;
+    background: #080d20;
+    color: #f8fafc;
+    font-family: "Segoe UI", sans-serif;
+  }
+
   .container {
-    max-width: 1000px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 40px 24px 60px;
+    padding: 72px 24px;
   }
 
   .image-detail {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 36px;
-    margin-bottom: 48px;
-    align-items: start;
+    grid-template-columns: minmax(320px, 560px) 1fr;
+    gap: 48px;
+    align-items: center;
+    margin-bottom: 56px;
   }
 
   .image-detail img {
     width: 100%;
-    border-radius: 18px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 24px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+    background: #020617;
   }
 
   .info {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
   }
 
   .info h1 {
-    margin: 0;
-    font-size: 2.2rem;
+    font-size: clamp(2.3rem, 5vw, 4.5rem);
+    line-height: 1;
     color: #f8fafc;
-    line-height: 1.2;
+    margin: 0 0 16px;
+    text-shadow: 0 0 24px rgba(129, 140, 248, 0.25);
   }
 
   .category {
-    width: fit-content;
-    padding: 5px 12px;
-    border-radius: 999px;
-    background: rgba(34, 211, 238, 0.14);
+    display: inline-flex;
+    align-items: center;
+    background: #0e7490;
     color: #67e8f9;
-    font-size: 0.8rem;
-    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    margin-bottom: 22px;
   }
 
   .info p {
-    margin: 0;
-    color: #94a3b8;
-    line-height: 1.7;
-    font-size: 0.95rem;
+    color: #cbd5e1;
+    margin: 0 0 24px;
+    line-height: 1.8;
+    font-size: 1.08rem;
+    max-width: 620px;
   }
 
   .comments-section {
@@ -94,9 +115,28 @@ if (!body) return Astro.redirect("/");
     gap: 16px;
   }
 
-  @media (max-width: 640px) {
+  :global(.comments),
+  :global(.comment-list) {
+    color: #f8fafc;
+  }
+
+  :global(h2),
+  :global(h3) {
+    color: #f8fafc;
+  }
+
+  @media (max-width: 900px) {
+    .container {
+      padding: 40px 18px;
+    }
+
     .image-detail {
       grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    .info {
+      padding: 24px;
     }
   }
 </style>

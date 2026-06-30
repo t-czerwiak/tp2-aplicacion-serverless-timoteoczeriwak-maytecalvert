@@ -115,3 +115,4 @@ Ningún cambio se mergea directo a `main` o `develop`. Todo pasa por un PR aprob
 El deploy a producción solo ocurre si todos los pasos anteriores pasan y el push es a `main`.
 
 Ver [CALIDAD.md](./CALIDAD.md) para la documentación completa de calidad: estrategia, herramientas, tests desarrollados, casos de uso críticos y limitaciones.
+>>>>>>> origin/develop
