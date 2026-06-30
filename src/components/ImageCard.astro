@@ -5,9 +5,10 @@ import CommentForm from "./CommentForm.astro";
 
 const { item } = Astro.props;
 ---
-
-<article class="card">
-  <img class="card-image" src={item.image_url} alt={item.name ?? item.title} />
+<article class="card image-card">
+  <a href={`/image/${item.id}`}>
+    <img class="card-image" src={item.image_url} alt={item.name ?? item.title} />
+  </a>
 
   <div class="content">
     <div class="text-content">
@@ -90,9 +91,6 @@ const { item } = Astro.props;
   }
 
   .comments-box {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
     padding-top: 16px;
     border-top: 1px solid rgba(148, 163, 184, 0.18);
   }

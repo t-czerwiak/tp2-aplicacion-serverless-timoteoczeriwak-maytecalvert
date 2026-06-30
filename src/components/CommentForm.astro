@@ -9,26 +9,23 @@ const { bodyId } = Astro.props;
 
 <script>
   import { getUser, addComment } from "../lib/api";
+  import { validateCommentInput } from "../lib/validation";
 
   document.querySelectorAll(".comment-form").forEach((form) => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const btn = form.querySelector("button");
-      const input = form.querySelector("input");
-      if (btn.disabled) return;
-      btn.disabled = true;
-
       const { data: { user } } = await getUser();
-      if (!user) { btn.disabled = false; window.location.href = "/login"; return; }
+      if (!user) { window.location.href = "/login"; return; }
 
+      const input = form.querySelector("input");
       const text = input.value.trim();
       const bodyId = form.dataset.id;
-      if (!text) { btn.disabled = false; return; }
+
+      const check = validateCommentInput(text);
+      if (!check.valid) return;
 
       const { error } = await addComment(user.id, bodyId, text);
-
-      btn.disabled = false;
 
       if (!error) {
         input.value = "";
@@ -64,5 +61,4 @@ const { bodyId } = Astro.props;
     cursor: pointer;
   }
   button:hover { background: #6366f1; }
-  button:disabled { background: #334155; cursor: not-allowed; }
 </style>
