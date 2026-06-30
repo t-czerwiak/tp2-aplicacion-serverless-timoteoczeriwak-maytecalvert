@@ -1,107 +1,118 @@
-Ya dejé armado el front visual con componentes separados. La conexión con back debería hacerse principalmente desde `src/lib/api.js`, porque todos los componentes consumen funciones desde ahí.
-
-Los puntos a conectar serían:
-
-`getAllBodies()` para traer las imágenes/cuerpos de la home.
-`addFavorite(bodyId)` y `removeFavorite(bodyId)` para favoritos.
-`getUserFavorites()` para la pantalla de favoritos.
-`getComments(bodyId)` para mostrar comentarios de cada imagen.
-`addComment(bodyId, content)` para guardar comentarios.
-`signIn(email, password)` para login.
-`signUp(email, password)` para registro.
-`signOut()` y `getUser()` para sesión.
-
-La idea es reemplazar los mocks de `api.js` por llamadas reales a Supabase sin tocar los componentes visuales.
-
-
 # NASA Space Explorer
 
+Aplicación web tipo museo digital del espacio, donde podés explorar cuerpos celestes con imágenes reales, guardar tus favoritos y dejar comentarios.
 
-Mayte Calvert
-Curso: 5A
-
-
-# Descripción
-
-El proyecto consiste en una aplicación web sobre el espacio (NASA), donde se pueden ver imágenes de cuerpos celestes, interactuar con ellas y gestionar contenido del usuario.
-
-El trabajo está dividido en dos partes:
-- Frontend (visual)
-- Backend (serverless)
-
-En este caso se desarrolló la parte visual.
-
-
-
-# Qué hice
-
-- Diseño general de la página
-- Cards para mostrar imágenes del espacio
-- Estructura de componentes reutilizables
-- Pantallas de login y registro
-- Página de favoritos (estructura base)
-- Sistema de comentarios (visual)
-- Botón de favoritos (visual)
-
-
-
-# Funcionalidades
-
-- Ver imágenes del espacio organizadas en cards
-- Agregar una imagen a favoritos
-- Ver comentarios en cada imagen
-- Escribir comentarios
-- Navegar a login y register
-- Interfaz responsive básica
-
-
-# Estructura
-
-src/
-components/
-pages/
-layouts/
-lib/
-
-# Cómo ejecutar
-
-1. Entrar a la carpeta del frontend:
-
-cd nasa-space-explorer
-
-2. Instalar dependencias:
-
-npm install
-
-3. Ejecutar el proyecto:
-
-npm run dev
-
-4. Abrir en el navegador:
-
-http://localhost:4321
+Desarrollada como Trabajo Práctico para la materia UX (TP2: aplicación serverless, TP3: calidad y CI/CD).
 
 ---
 
-# TP3 — Calidad y CI/CD (lado frontend)
+## Equipo
 
-## Qué se agregó
+| Integrante | Rama | Responsabilidad |
+|---|---|---|
+| Timoteo Czerwiak | `timoteo-czerwiak` | Backend: base de datos, autenticación y API con Supabase |
+| Mayte Calvert | `mayte-calvert` | Frontend: diseño, páginas y componentes con Astro |
 
-- `src/lib/validation.js`: funciones de validación de formularios (email de registro, contraseña, username, comentarios)
-- `src/tests/validation.test.js`: tests unitarios con Vitest sobre esas validaciones
-- `eslint.config.js`: configuración de lint
-- Scripts nuevos en `package.json`: `lint`, `test`, `test:coverage`
+---
 
-## Cómo correr los tests
+## Stack tecnológico
+
+- **Frontend:** Astro
+- **Base de datos y autenticación:** Supabase
+- **Deploy:** Vercel
+- **CI/CD:** GitHub Actions
+- **Tests unitarios:** Vitest
+- **Tests E2E:** Playwright
+- **Lint:** ESLint
+
+---
+
+## Funcionalidades
+
+- Registro, inicio y cierre de sesión de usuarios
+- Exploración de cuerpos celestes con imágenes (planetas, estrellas, agujeros negros, galaxias, nebulosas)
+- Guardar cuerpos celestes como favoritos
+- Comentar en cada cuerpo celeste, con edición y borrado de comentarios propios
+- Perfil de usuario con nombre editable
+
+---
+
+## Base de datos
+
+El proyecto usa Supabase con las siguientes tablas:
+
+- `celestial_bodies` — contenido del museo (nombre, categoría, descripción, imagen)
+- `profiles` — perfil de cada usuario registrado
+- `favorites` — favoritos asociados a cada usuario
+- `comments` — comentarios por cuerpo celeste y usuario
+
+Todos los accesos están protegidos con Row Level Security (RLS).
+
+---
+
+## URL de producción
+
+> Se completa una vez deployado en Vercel.
+
+---
+
+## Setup local
 
 ```bash
+git clone https://github.com/t-czerwiak/tp2-aplicacion-serverless-timoteoczeriwak-maytecalvert.git
+cd tp2-aplicacion-serverless-timoteoczeriwak-maytecalvert
 npm install
-npm run test
-npm run lint
+cp .env.example .env   # completar con las keys de Supabase
+npm run dev
 ```
 
-## Pendiente de integrar con la parte de Timo
+## Variables de entorno
 
-- Fusionar este `CALIDAD-FRONTEND.md` dentro del `CALIDAD.md` general (sección de herramientas, tests y casos de uso del lado frontend)
-- El pipeline (`.github/workflows/ci.yml`) y la config de E2E (`e2e/`, `playwright.config.js`) ya están copiados acá como referencia, pero corren sobre `main`/`develop`, no sobre esta rama individual — no hace falta correrlos localmente salvo `npm run lint` y `npm run test`
-- Una vez que las ramas se mergeen, los componentes (`CommentForm`, `register`, `profile`) van a llamar a las funciones de `api.js` de Timo en vez de `supabase` directo — ahí hay que mantener las validaciones que se agregaron en este TP3 (`validateRegisterEmail`, `validatePassword`, `validateUsername`, `validateCommentInput`)
+```
+PUBLIC_SUPABASE_URL=
+PUBLIC_SUPABASE_ANON_KEY=
+```
+
+## Scripts
+
+```bash
+npm run dev            # servidor de desarrollo
+npm run build          # build de producción
+npm run lint           # lint del código
+npm run test           # tests unitarios
+npm run test:e2e       # tests E2E (requiere app corriendo)
+npm run test:coverage  # cobertura de tests
+```
+
+---
+
+## Estructura de ramas
+
+```
+main              ← versión estable y desplegada
+develop           ← integración de ambas partes
+timoteo-czerwiak  ← desarrollo del backend
+mayte-calvert     ← desarrollo del frontend
+```
+
+### Branch naming
+
+| Tipo | Convención | Ejemplo |
+|---|---|---|
+| Feature | `feature/nombre` | `feature/favoritos` |
+| Fix | `fix/nombre` | `fix/login-error` |
+| Refactor | `refactor/nombre` | `refactor/api-layer` |
+| Chore | `chore/nombre` | `chore/ci-setup` |
+
+Ningún cambio se mergea directo a `main` o `develop`. Todo pasa por un PR aprobado por el otro integrante.
+
+---
+
+## Pipeline CI/CD
+
+`lint → test → build → e2e → deploy`
+
+El deploy a producción solo ocurre si todos los pasos anteriores pasan y el push es a `main`.
+
+Ver [CALIDAD.md](./CALIDAD.md) para la documentación completa de calidad: estrategia, herramientas, tests desarrollados, casos de uso críticos y limitaciones.
+>>>>>>> origin/develop

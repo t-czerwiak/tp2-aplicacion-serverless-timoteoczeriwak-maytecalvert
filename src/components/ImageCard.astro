@@ -5,7 +5,6 @@ import CommentForm from "./CommentForm.astro";
 
 const { item } = Astro.props;
 ---
-
 <article class="card image-card">
   <a href={`/image/${item.id}`}>
     <img class="card-image" src={item.image_url} alt={item.name ?? item.title} />

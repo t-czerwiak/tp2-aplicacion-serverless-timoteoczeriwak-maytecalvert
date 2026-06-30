@@ -2,49 +2,18 @@
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
 import CommentList from "../../components/CommentList.astro";
+import CommentForm from "../../components/CommentForm.astro";
 import FavoriteButton from "../../components/FavoriteButton.astro";
-import { supabase } from "../../lib/supabase";
+import { getBodyById, getAllBodies } from "../../lib/api";
 
 export async function getStaticPaths() {
-  const { data: bodies, error } = await supabase
-    .from("celestial_bodies")
-    .select("id");
-
-  if (error || !bodies) {
-    console.error("Error cargando rutas dinámicas:", error);
-    return [];
-  }
-
-  return bodies.map((body) => ({
-    params: {
-      id: String(body.id),
-    },
-  }));
+  const { data } = await getAllBodies();
+  return (data ?? []).map(body => ({ params: { id: body.id } }));
 }
 
 const { id } = Astro.params;
-
-const { data: body, error: bodyError } = await supabase
-  .from("celestial_bodies")
-  .select("*")
-  .eq("id", id)
-  .single();
-
-if (bodyError || !body) {
-  return Astro.redirect("/");
-}
-
-const { data: comments, error: commentsError } = await supabase
-  .from("comments")
-  .select("*, profiles(username)")
-  .eq("celestial_body_id", id)
-  .order("created_at", { ascending: false });
-
-if (commentsError) {
-  console.error("Error cargando comentarios:", commentsError);
-}
-
-const safeComments = comments ?? [];
+const { data: body } = await getBodyById(id);
+if (!body) return Astro.redirect("/");
 ---
 
 <Layout title={body.name}>
@@ -63,7 +32,10 @@ const safeComments = comments ?? [];
       </div>
     </div>
 
-    <CommentList comments={safeComments} bodyId={body.id} />
+    <div class="comments-section">
+      <CommentList bodyId={body.id} />
+      <CommentForm bodyId={body.id} />
+    </div>
   </main>
 </Layout>
 
@@ -133,6 +105,14 @@ const safeComments = comments ?? [];
     line-height: 1.8;
     font-size: 1.08rem;
     max-width: 620px;
+  }
+
+  .comments-section {
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    padding-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
   :global(.comments),

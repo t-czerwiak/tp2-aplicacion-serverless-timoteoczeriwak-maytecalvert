@@ -24,7 +24,7 @@ import Header from "../components/Header.astro";
 </Layout>
 
 <script>
-  import { supabase } from "../lib/supabase";
+  import { signUp, createProfile } from "../lib/api";
   import { validateRegisterEmail, validatePassword } from "../lib/validation";
 
   document.querySelector("form")?.addEventListener("submit", async (e) => {
@@ -52,7 +52,7 @@ import Header from "../components/Header.astro";
     btnEl.disabled = true;
     errorMsg.textContent = "";
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await signUp(email, password);
 
     if (error) {
       errorMsg.textContent = error.message;
@@ -61,10 +61,7 @@ import Header from "../components/Header.astro";
     } else {
       const user = data.user;
       if (user) {
-        await supabase.from("profiles").insert({
-          id: user.id,
-          username: email.split("@")[0]
-        });
+        await createProfile(user.id, email.split("@")[0]);
       }
       window.location.href = "/";
     }
@@ -96,14 +93,8 @@ import Header from "../components/Header.astro";
     box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
   }
 
-  h1 {
-    margin: 0 0 8px;
-    color: #f8fafc;
-  }
-
-  p {
-    color: #94a3b8;
-  }
+  h1 { margin: 0 0 8px; color: #f8fafc; }
+  p { color: #94a3b8; }
 
   form {
     display: flex;
@@ -130,7 +121,5 @@ import Header from "../components/Header.astro";
     cursor: pointer;
   }
 
-  a {
-    color: #67e8f9;
-  }
+  a { color: #67e8f9; }
 </style>

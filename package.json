@@ -21,9 +21,9 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0",
+    "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^9.0.0",
     "eslint-plugin-astro": "^1.2.0",
-    "vitest": "^1.6.0",
-    "@vitest/coverage-v8": "^1.6.0"
+    "vitest": "^1.6.0"
   }
 }

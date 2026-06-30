@@ -8,14 +8,14 @@ const { bodyId } = Astro.props;
 </form>
 
 <script>
-  import { supabase } from "../lib/supabase";
+  import { getUser, addComment } from "../lib/api";
   import { validateCommentInput } from "../lib/validation";
 
   document.querySelectorAll(".comment-form").forEach((form) => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) { window.location.href = "/login"; return; }
 
       const input = form.querySelector("input");
@@ -25,11 +25,7 @@ const { bodyId } = Astro.props;
       const check = validateCommentInput(text);
       if (!check.valid) return;
 
-      const { error } = await supabase.from("comments").insert({
-        user_id: user.id,
-        celestial_body_id: bodyId,
-        content: text
-      });
+      const { error } = await addComment(user.id, bodyId, text);
 
       if (!error) {
         input.value = "";

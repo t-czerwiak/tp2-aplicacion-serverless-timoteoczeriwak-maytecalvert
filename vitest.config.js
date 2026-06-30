@@ -7,7 +7,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
-      include: ["src/lib/validation.js"],
+      include: ["src/lib/utils.js", "src/lib/validation.js"],
     },
   },
 });
