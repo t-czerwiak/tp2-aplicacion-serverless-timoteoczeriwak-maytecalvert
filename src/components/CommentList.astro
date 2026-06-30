@@ -100,48 +100,49 @@ const { bodyId } = Astro.props;
 </script>
 
 <style>
-  .comments-wrapper { display: flex; flex-direction: column; }
-
-  h4 { margin: 0 0 10px; color: #f8fafc; font-size: 1rem; }
-
-  .comment-list {
-    flex: 1;
-    overflow-y: auto;
-    max-height: 200px;
+  .comments-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding-right: 4px;
   }
 
-  .comment-list::-webkit-scrollbar { width: 4px; }
-  .comment-list::-webkit-scrollbar-track { background: transparent; }
-  .comment-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 999px; }
+  h4 {
+    margin: 0 0 16px;
+    color: #f8fafc;
+    font-size: 1.15rem;
+  }
+
+  .comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
 
   .comment-item {
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: #020617;
-    position: relative;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.12);
   }
 
   .comment-author {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #67e8f9;
     font-weight: 700;
   }
 
   .comment-content {
-    margin: 4px 0 0;
+    margin: 6px 0 0;
     color: #e2e8f0;
-    font-size: 0.9rem;
-    line-height: 1.4;
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
   .comment-actions {
     display: none;
     gap: 8px;
-    margin-top: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
   }
 
   .comment-actions.visible {
@@ -149,11 +150,17 @@ const { bodyId } = Astro.props;
   }
 
   .edit-btn, .delete-btn {
-    padding: 4px 10px;
+    padding: 6px 14px;
     border: none;
     border-radius: 8px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .edit-btn:hover, .delete-btn:hover {
+    opacity: 0.85;
   }
 
   .edit-btn { background: #818cf8; color: white; }
@@ -162,14 +169,14 @@ const { bodyId } = Astro.props;
   .edit-container {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-top: 8px;
+    gap: 8px;
+    margin-top: 12px;
   }
 
   .edit-input {
     width: 100%;
     box-sizing: border-box;
-    padding: 6px 10px;
+    padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid rgba(148, 163, 184, 0.25);
     background: #0f172a;
@@ -179,21 +186,29 @@ const { bodyId } = Astro.props;
 
   .edit-actions {
     display: flex;
-    gap: 6px;
+    gap: 8px;
   }
 
   .save-btn, .cancel-btn {
     flex: 1;
-    padding: 6px 10px;
+    padding: 8px 10px;
     border: none;
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
 
   .save-btn { background: #22d3ee; color: #020617; }
   .cancel-btn { background: #334155; color: white; }
 
-  .empty { margin: 0; color: #94a3b8; font-size: 0.9rem; }
+  .empty {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    padding: 20px;
+    text-align: center;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 14px;
+  }
 </style>
